@@ -15,11 +15,16 @@ public class ChartController implements Controller {
 
     @Override
     public float getY(float x) {
-        return 0;
+        return x * x;
     }
 
     @Override
     public void runApp() {
         view.setVisible(true);
+    }
+
+    @Override
+    public void removePoint(float x) {
+
     }
 }

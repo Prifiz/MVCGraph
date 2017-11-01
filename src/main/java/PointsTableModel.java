@@ -1,11 +1,11 @@
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.util.*;
 
-public class PointsTableModel implements TableModel, Observable {
+public class PointsTableModel extends AbstractTableModel implements TableModel, Observable {
 
     private List<Point> points;
     private Set<TableModelListener> listeners;
@@ -18,16 +18,27 @@ public class PointsTableModel implements TableModel, Observable {
         notifyAllObservers();
     }
 
+    private float calcFunctionValue(float x) {
+        return x*x;
+    }
+
     public void addPoint(Point point) {
         points.add(point);
+        Collections.sort(points);
         if(!point.isEmpty()) {
             notifyAllObservers();
         }
     }
 
+    public void addPoint(float x) {
+        Point point = new Point(x, calcFunctionValue(x));
+        addPoint(point);
+    }
+
     public void removePoint(int idx) {
         Point pointToRemove = points.get(idx);
         points.remove(idx);
+        Collections.sort(points);
         if(!pointToRemove.isEmpty()) {
             notifyAllObservers();
         }
@@ -36,6 +47,7 @@ public class PointsTableModel implements TableModel, Observable {
     public void changePoint(int idx, Point changedPoint) {
         points.get(idx).setX(changedPoint.getX());
         points.get(idx).setY(changedPoint.getY());
+        Collections.sort(points);
         notifyAllObservers();
     }
 
@@ -81,10 +93,12 @@ public class PointsTableModel implements TableModel, Observable {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if(columnIndex == 0) {
             points.get(rowIndex).setX((Float)aValue);
+            points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
         } else {
             points.get(rowIndex).setY((Float)aValue);
         }
         notifyAllObservers();
+        fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     @Override
@@ -105,7 +119,7 @@ public class PointsTableModel implements TableModel, Observable {
     @Override
     public void notifyAllObservers() {
         for(Observer observer : observers) {
-            observer.handleEvent(this);
+            observer.handleEvent();
         }
     }
 
@@ -114,17 +128,5 @@ public class PointsTableModel implements TableModel, Observable {
         final String LEGEND = "y = x^2";
         points.forEach(point -> dataset.addValue((Number) point.getY(), LEGEND, point.getX()));
         return dataset;
-    }
-
-    private void fireTableChanged(TableModelEvent e) {
-        // Guaranteed to return a non-null array
-
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.size() - 2; i >= 0; i -= 2) {
-            if (listeners.toArray()[i] == TableModelListener.class) {
-                ((TableModelListener)listeners.toArray()[i + 1]).tableChanged(e);
-            }
-        }
     }
 }

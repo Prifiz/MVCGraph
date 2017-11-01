@@ -1,21 +1,18 @@
+import org.jfree.data.category.DefaultCategoryDataset;
+
 public class ChartController implements Controller {
 
     private MainWindow view;
     private PointsTableModel model;
-
 
     public ChartController(PointsTableModel model) {
         this.model = model;
         this.view = new MainWindow(800, 600, model, this);
     }
 
-    private void updateChart() {
-
-    }
-
     @Override
     public void addPoint(float x) {
-        model.addPoint(new Point(x, getY(x)));
+        model.addPoint(x);
     }
 
     @Override
@@ -41,5 +38,10 @@ public class ChartController implements Controller {
     @Override
     public void changePoint(int idx, float changedX) {
         model.changePoint(idx, new Point(changedX, getY(changedX)));
+    }
+
+    @Override
+    public DefaultCategoryDataset getDataset() {
+        return model.toDataset();
     }
 }

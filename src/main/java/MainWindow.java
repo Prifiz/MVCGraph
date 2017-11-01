@@ -5,10 +5,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import java.awt.*;
 
 public class MainWindow extends JFrame implements Observer {
@@ -60,27 +56,18 @@ public class MainWindow extends JFrame implements Observer {
         table = new JTable(model);
         scrollPane = new JScrollPane(table);
         scrollPane.updateUI();
-
-        model.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
-                PointsTableModel model = (PointsTableModel) e.getSource();
-                Object data = model.getValueAt(row, column);
-                controller.changePoint(row, (Float) data);
-            }
-        });
     }
 
     private void initButtonsActions() {
         addPointButton.addActionListener(e -> {
             controller.addPoint(new EmptyPoint());
             table.updateUI();
+            refreshChart();
         });
         removePointButton.addActionListener(e -> {
             controller.removePoint(table.getSelectedRow());
             table.updateUI();
+            refreshChart();
         });
     }
 
@@ -129,8 +116,9 @@ public class MainWindow extends JFrame implements Observer {
     }
 
     @Override
-    public void handleEvent(PointsTableModel model) {
-        this.dataset = model.toDataset();
+    public void handleEvent() {
+        this.dataset = controller.getDataset();
+        table.updateUI();
         refreshChart();
     }
 }

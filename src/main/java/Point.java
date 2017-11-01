@@ -1,4 +1,4 @@
-public class Point {
+public class Point implements Comparable {
     private float x;
     private float y;
     protected boolean empty;
@@ -27,5 +27,16 @@ public class Point {
 
     public boolean isEmpty() {
         return empty;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(this.getX() < ((Point)o).getX()) {
+            return -1;
+        } else if(this.getX() > ((Point)o).getX()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

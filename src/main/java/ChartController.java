@@ -1,16 +1,21 @@
 public class ChartController implements Controller {
 
-    private View view;
-    //private Model model;
+    private MainWindow view;
+    private PointsTableModel model;
 
 
-    public ChartController(View view) {
-        this.view = view;
+    public ChartController(PointsTableModel model) {
+        this.model = model;
+        this.view = new MainWindow(800, 600, model, this);
+    }
+
+    private void updateChart() {
+
     }
 
     @Override
     public void addPoint(float x) {
-
+        model.addPoint(x, getY(x));
     }
 
     @Override

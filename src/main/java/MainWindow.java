@@ -5,6 +5,10 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 
 public class MainWindow extends JFrame implements Observer {
@@ -14,36 +18,70 @@ public class MainWindow extends JFrame implements Observer {
     private JTable table;
     private JScrollPane scrollPane;
     private DefaultCategoryDataset dataset;
+    private JButton addPointButton;
+    private JButton removePointButton;
 
     private PointsTableModel model;
     private ChartController controller;
 
-    public MainWindow(int width, int height, PointsTableModel model, ChartController controller) throws HeadlessException {
+    public MainWindow(int width, int height, PointsTableModel model, ChartController controller)
+            throws HeadlessException {
+        this.addPointButton = new JButton("Add Point");
+        this.removePointButton = new JButton("Remove Point");
         this.model = model;
         this.controller = controller;
         this.dataset = model.toDataset();
         model.registerObserver(this);
-//        model.addTableModelListener(e -> {
-//
-//        });
+
+        initFrame(width, height);
+        initChart(width, height);
+        initTable();
+        initButtonsActions();
+        initLayout();
+
+        pack();
+    }
+
+    private void initFrame(int width, int height) {
         setTitle("MVC Lab");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        table = new JTable(model);
-        scrollPane = new JScrollPane(table);
-        scrollPane.updateUI();
         setLocationRelativeTo(null);
         setSize(width, height);
         setResizable(false);
+    }
+
+    private void initChart(int width, int height) {
         lineChart = createChart();
         chartPanel = new ChartPanel( lineChart );
         chartPanel.setPreferredSize(new Dimension(width, height/2));
-        initLayout();
-        pack();
-
     }
 
-    public void updateChart(DefaultCategoryDataset dataset) {
+    private void initTable() {
+        table = new JTable(model);
+        scrollPane = new JScrollPane(table);
+        scrollPane.updateUI();
 
+        model.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+                PointsTableModel model = (PointsTableModel) e.getSource();
+                Object data = model.getValueAt(row, column);
+                controller.changePoint(row, (Float) data);
+            }
+        });
+    }
+
+    private void initButtonsActions() {
+        addPointButton.addActionListener(e -> {
+            controller.addPoint(new EmptyPoint());
+            table.updateUI();
+        });
+        removePointButton.addActionListener(e -> {
+            controller.removePoint(table.getSelectedRow());
+            table.updateUI();
+        });
     }
 
     private void initLayout() {
@@ -57,14 +95,20 @@ public class MainWindow extends JFrame implements Observer {
         GroupLayout.SequentialGroup horizontalGroup = groupLayout.createSequentialGroup();
         horizontalGroup.addGroup(groupLayout.createParallelGroup()
                 .addComponent(chartPanel)
-                .addComponent(scrollPane));
+                .addComponent(scrollPane)
+                .addGroup(groupLayout.createSequentialGroup())
+                    .addComponent(addPointButton)
+                    .addComponent(removePointButton));
 
         groupLayout.setHorizontalGroup(horizontalGroup);
 
         GroupLayout.SequentialGroup vGroup = groupLayout.createSequentialGroup();
         vGroup.addGroup(groupLayout.createSequentialGroup()
                 .addComponent(chartPanel)
-                .addComponent(scrollPane));
+                .addComponent(scrollPane)
+                .addGroup(groupLayout.createParallelGroup())
+                    .addComponent(addPointButton)
+                    .addComponent(removePointButton));
 
         groupLayout.setVerticalGroup(vGroup);
     }

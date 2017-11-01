@@ -15,7 +15,12 @@ public class ChartController implements Controller {
 
     @Override
     public void addPoint(float x) {
-        model.addPoint(x, getY(x));
+        model.addPoint(new Point(x, getY(x)));
+    }
+
+    @Override
+    public void addPoint(Point point) {
+        model.addPoint(point);
     }
 
     @Override
@@ -29,7 +34,12 @@ public class ChartController implements Controller {
     }
 
     @Override
-    public void removePoint(float x) {
+    public void removePoint(int idx) {
+        model.removePoint(idx);
+    }
 
+    @Override
+    public void changePoint(int idx, float changedX) {
+        model.changePoint(idx, new Point(changedX, getY(changedX)));
     }
 }

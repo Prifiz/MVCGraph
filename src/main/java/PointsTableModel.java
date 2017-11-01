@@ -1,6 +1,7 @@
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.event.TableModelListener;
+
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.util.*;
@@ -53,7 +54,11 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
 
     @Override
     public int getRowCount() {
-        return points.size();
+        if(points==null) {
+            return 0;
+        } else {
+            return points.size();
+        }
     }
 
     @Override
@@ -94,16 +99,26 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
         if(columnIndex == 0) {
             points.get(rowIndex).setX((Float)aValue);
             points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
-        } else {
-            points.get(rowIndex).setY((Float)aValue);
+            points.get(rowIndex).setEmpty(false);
+//            points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
+//        } else {
+//            points.get(rowIndex).setY((Float)aValue);
         }
+        if(columnIndex == 1) {
+            points.get(rowIndex).setY(((Float)aValue));
+            points.get(rowIndex).setEmpty(false);
+        }
+        Collections.sort(points);
+
         notifyAllObservers();
-        fireTableCellUpdated(rowIndex, columnIndex);
+        fireTableDataChanged();
+        //fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     @Override
     public void addTableModelListener(TableModelListener l) {
         listeners.add(l);
+        //notifyAllObservers();
     }
 
     @Override
@@ -126,7 +141,11 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
     public DefaultCategoryDataset toDataset() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         final String LEGEND = "y = x^2";
-        points.forEach(point -> dataset.addValue((Number) point.getY(), LEGEND, point.getX()));
+        points.forEach(point -> {
+            if(!point.isEmpty()) {
+                dataset.addValue((Number) point.getY(), LEGEND, point.getX());
+            }
+        });
         return dataset;
     }
 }

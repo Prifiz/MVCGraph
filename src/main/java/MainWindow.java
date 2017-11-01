@@ -1,3 +1,4 @@
+import javafx.scene.input.KeyCode;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -5,15 +6,19 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-public class MainWindow extends JFrame implements Observer {
+public class MainWindow extends JFrame implements Observer, TableModelListener {
 
     private JFreeChart lineChart;
     private ChartPanel chartPanel;
     private JTable table;
     private JScrollPane scrollPane;
-    private DefaultCategoryDataset dataset;
+    //private DefaultCategoryDataset dataset;
     private JButton addPointButton;
     private JButton removePointButton;
 
@@ -26,12 +31,13 @@ public class MainWindow extends JFrame implements Observer {
         this.removePointButton = new JButton("Remove Point");
         this.model = model;
         this.controller = controller;
-        this.dataset = model.toDataset();
+        //this.dataset = model.toDataset();
         model.registerObserver(this);
 
         initFrame(width, height);
         initChart(width, height);
         initTable();
+        controller.addListener(this);
         initButtonsActions();
         initLayout();
 
@@ -110,15 +116,20 @@ public class MainWindow extends JFrame implements Observer {
         return ChartFactory.createLineChart(
                 "Function chart",
                 "x","y",
-                dataset,
+                controller.getDataset(),
                 PlotOrientation.VERTICAL,
                 true,true,false);
     }
 
     @Override
     public void handleEvent() {
-        this.dataset = controller.getDataset();
+        //this.dataset = controller.getDataset();
         table.updateUI();
         refreshChart();
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        System.out.println("CHANGED!");
     }
 }

@@ -1,10 +1,15 @@
+import controller.ChartController;
+import controller.Controller;
+import model.Model;
+import model.PointsTableModel;
+
 public class Main {
     public static void main(String[] args) {
-        PointsTableModel model = new PointsTableModel();
+        Model model = new PointsTableModel();
         Controller controller = new ChartController(model);
-        controller.addPoint(1);
-        controller.addPoint(3);
-        controller.addPoint(2);
-        //controller.runApp();
+        final float INITIAL_MAX_X = 15.0f;
+        for (float x = -INITIAL_MAX_X; x <= INITIAL_MAX_X; x++) {
+            controller.addPoint(x);
+        }
     }
 }

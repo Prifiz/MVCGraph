@@ -1,29 +1,36 @@
+package controller;
+
+import model.Model;
 import org.jfree.data.category.DefaultCategoryDataset;
+import view.MainWindow;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 
+import model.Point;
+import view.View;
+
 public class ChartController implements Controller {
 
-    private MainWindow view;
-    private PointsTableModel model;
+    private View view;
+    private Model model;
 
-    public ChartController(PointsTableModel model) {
+    public ChartController(Model model) {
         this.model = model;
-        try
-        {
+        try {
             SwingUtilities.invokeAndWait(() -> EventQueue.invokeLater(() -> {
                 this.view = new MainWindow(800, 600, model, this);
-                view.setVisible(true);
+                view.launch();
             }));
         } catch (InvocationTargetException | InterruptedException e) {
             System.out.println("FAIL!");
         }
+    }
 
-
-        }@Override
+    @Override
     public void addPoint(float x) {
         model.addPoint(x);
     }
@@ -34,23 +41,8 @@ public class ChartController implements Controller {
     }
 
     @Override
-    public float getY(float x) {
-        return x * x;
-    }
-
-//    @Override
-//    public void runApp() {
-//        view.setVisible(true);
-//    }
-
-    @Override
     public void removePoint(int idx) {
         model.removePoint(idx);
-    }
-
-    @Override
-    public void changePoint(int idx, float changedX) {
-        model.changePoint(idx, new Point(changedX, getY(changedX)));
     }
 
     @Override
@@ -60,6 +52,6 @@ public class ChartController implements Controller {
 
     @Override
     public void addListener(TableModelListener listener) {
-        this.model.addTableModelListener(listener);
+        ((AbstractTableModel)this.model).addTableModelListener(listener);
     }
 }

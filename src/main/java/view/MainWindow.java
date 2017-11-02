@@ -1,38 +1,39 @@
-import javafx.scene.input.KeyCode;
+package view;
+
+import controller.Controller;
+import model.EmptyPoint;
+import model.Model;
+import model.Observable;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
-public class MainWindow extends JFrame implements Observer, TableModelListener {
+public class MainWindow extends JFrame implements Observer, TableModelListener, View {
 
     private JFreeChart lineChart;
     private ChartPanel chartPanel;
     private JTable table;
     private JScrollPane scrollPane;
-    //private DefaultCategoryDataset dataset;
     private JButton addPointButton;
     private JButton removePointButton;
 
-    private PointsTableModel model;
-    private ChartController controller;
+    private Model model;
+    private Controller controller;
 
-    public MainWindow(int width, int height, PointsTableModel model, ChartController controller)
+    public MainWindow(int width, int height, Model model, Controller controller)
             throws HeadlessException {
         this.addPointButton = new JButton("Add Point");
         this.removePointButton = new JButton("Remove Point");
         this.model = model;
         this.controller = controller;
-        //this.dataset = model.toDataset();
-        model.registerObserver(this);
+        ((Observable)model).registerObserver(this);
 
         initFrame(width, height);
         initChart(width, height);
@@ -59,7 +60,7 @@ public class MainWindow extends JFrame implements Observer, TableModelListener {
     }
 
     private void initTable() {
-        table = new JTable(model);
+        table = new JTable((AbstractTableModel)model);
         scrollPane = new JScrollPane(table);
         scrollPane.updateUI();
     }
@@ -123,7 +124,6 @@ public class MainWindow extends JFrame implements Observer, TableModelListener {
 
     @Override
     public void handleEvent() {
-        //this.dataset = controller.getDataset();
         table.updateUI();
         refreshChart();
     }
@@ -131,5 +131,10 @@ public class MainWindow extends JFrame implements Observer, TableModelListener {
     @Override
     public void tableChanged(TableModelEvent e) {
         System.out.println("CHANGED!");
+    }
+
+    @Override
+    public void launch() {
+        setVisible(true);
     }
 }

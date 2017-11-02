@@ -1,20 +1,19 @@
-import org.jfree.data.category.DefaultCategoryDataset;
+package model;
 
-import javax.swing.event.TableModelListener;
+import org.jfree.data.category.DefaultCategoryDataset;
+import view.Observer;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.util.*;
 
-public class PointsTableModel extends AbstractTableModel implements TableModel, Observable {
+public class PointsTableModel extends AbstractTableModel implements TableModel, Observable, Model {
 
     private List<Point> points;
-    private Set<TableModelListener> listeners;
     private List<Observer> observers;
 
     public PointsTableModel() {
         points = new ArrayList<>();
-        listeners = new HashSet<>();
         observers = new ArrayList<>();
         notifyAllObservers();
     }
@@ -43,13 +42,6 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
         if(!pointToRemove.isEmpty()) {
             notifyAllObservers();
         }
-    }
-
-    public void changePoint(int idx, Point changedPoint) {
-        points.get(idx).setX(changedPoint.getX());
-        points.get(idx).setY(changedPoint.getY());
-        Collections.sort(points);
-        notifyAllObservers();
     }
 
     @Override
@@ -100,9 +92,6 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
             points.get(rowIndex).setX((Float)aValue);
             points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
             points.get(rowIndex).setEmpty(false);
-//            points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
-//        } else {
-//            points.get(rowIndex).setY((Float)aValue);
         }
         if(columnIndex == 1) {
             points.get(rowIndex).setY(((Float)aValue));
@@ -112,22 +101,10 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
 
         notifyAllObservers();
         fireTableDataChanged();
-        //fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     @Override
-    public void addTableModelListener(TableModelListener l) {
-        listeners.add(l);
-        //notifyAllObservers();
-    }
-
-    @Override
-    public void removeTableModelListener(TableModelListener l) {
-        listeners.remove(l);
-    }
-
-    @Override
-    public void registerObserver(Observer observer) {
+    public void registerObserver(view.Observer observer) {
         this.observers.add(observer);
     }
 

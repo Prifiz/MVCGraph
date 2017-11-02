@@ -61,6 +61,7 @@ public class MainWindow extends JFrame implements Observer, TableModelListener, 
 
     private void initTable() {
         table = new JTable((AbstractTableModel)model);
+        table.getColumn("X").setCellEditor(new TableFloatEditor(new XValueVerifier()));
         scrollPane = new JScrollPane(table);
         scrollPane.updateUI();
     }
@@ -72,6 +73,7 @@ public class MainWindow extends JFrame implements Observer, TableModelListener, 
             refreshChart();
         });
         removePointButton.addActionListener(e -> {
+            table.getColumn("X").getCellEditor().stopCellEditing();
             controller.removePoint(table.getSelectedRow());
             table.updateUI();
             refreshChart();
@@ -137,4 +139,5 @@ public class MainWindow extends JFrame implements Observer, TableModelListener, 
     public void launch() {
         setVisible(true);
     }
+
 }

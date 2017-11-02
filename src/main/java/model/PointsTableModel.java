@@ -89,12 +89,12 @@ public class PointsTableModel extends AbstractTableModel implements TableModel, 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if(columnIndex == 0) {
-            points.get(rowIndex).setX((Float)aValue);
-            points.get(rowIndex).setY(calcFunctionValue((Float)aValue));
+            points.get(rowIndex).setX(Float.valueOf((String) aValue));
+            points.get(rowIndex).setY(calcFunctionValue(Float.valueOf((String)aValue)));
             points.get(rowIndex).setEmpty(false);
         }
         if(columnIndex == 1) {
-            points.get(rowIndex).setY(((Float)aValue));
+            points.get(rowIndex).setY(Float.valueOf((String)aValue));
             points.get(rowIndex).setEmpty(false);
         }
         Collections.sort(points);

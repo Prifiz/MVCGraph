@@ -14,7 +14,7 @@ public class TableFloatEditor extends DefaultCellEditor {
     @Override
     public boolean stopCellEditing() {
         if(verifier.verify(editorComponent)) {
-            return stopCellEditing();
+            return super.stopCellEditing();
         } else {
             cancelCellEditing();
             return false;

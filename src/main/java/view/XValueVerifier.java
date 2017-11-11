@@ -13,6 +13,7 @@ public class XValueVerifier extends InputVerifier {
             verified = true;
             input.setBackground(Color.WHITE);
         } catch (NumberFormatException e) {
+            System.out.println("Not a number");
         }
         return verified;
     }
